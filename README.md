@@ -7,7 +7,7 @@ RabbitMQ is used to queue scraping tasks and to send the results in an email and
 
 ### Technologies Used
 - [Node.js](https://nodejs.org/en/)
-- [RabbitMQ](https://www.rabbitmq.com/) - For queueing scrape requests and emailing tasks
+- [RabbitMQ](https://www.rabbitmq.com/) - For queueing and then processing scrape and email tasks
 - [PM2](http://pm2.keymetrics.io/) - For running both the Express server as well as the RabbitMQ server and load balancing
 - [PostgreSQL](https://www.postgresql.org/) - Database
 - [Express](https://expressjs.com/) - Web server for receiving search requests
