@@ -13,13 +13,13 @@ rabbitMQ.connect('amqp://localhost', function(error, connection) {
     channel.consume(queue, async function(msg) {
       let message = JSON.parse(msg.content)
       // This is the part where the worker calls a function to process the queue task
-      await craigslistScrapeWaterfall(message)
+      await processEmailRequest(message)
       channel.ack(msg)
     }, { noAck: false })
   })
 })
 
-function craigslistScrapeWaterfall (message, response) {
+function processEmailRequest (message, response) {
     scrapeCraigslist(message)
         .then(results => sendEmail(results, message))
         .then(results => saveToDatabase(results, message))
