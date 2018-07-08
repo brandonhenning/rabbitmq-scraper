@@ -1,15 +1,17 @@
 # RabbitMQ Craigslist Emailer
 
 ## What This Is
-Node server-side application that accepts a search term and location and then scrapes Craigslist for listings and emails the user a results list and stores the seach in a Postgres database. RabbitMQ is used to queue scraping tasks and to send the results in an email and store the data to Postgres. PM2 is used to run both the Express server as well as the RabbitMQ server from inside the same application and to provide load balancing. 
+Node server-side application that accepts a search term, location, and email then scrapes Craigslist for listings and emails the user a results list and stores the seach in a Postgres database. 
+
+RabbitMQ is used to queue scraping tasks and to send the results in an email and store the data to Postgres. PM2 is used to run both the Express server as well as the RabbitMQ server from inside the same application and to provide load balancing. 
 
 ### Technologies Used
-- [RabbitMQ](https://www.rabbitmq.com/)
-- [PM2](http://pm2.keymetrics.io/)
-- [Nodemailer.js](https://nodemailer.com/about/)
-- Node.js
-- Postgres
-- Express
+- [Node.js](https://nodejs.org/en/)
+- [RabbitMQ](https://www.rabbitmq.com/) - For queueing scrape requests and emailing tasks
+- [PM2](http://pm2.keymetrics.io/) - For running both the Express server as well as the RabbitMQ server and load balancing
+- [PostgreSQL](https://www.postgresql.org/) - Database
+- [Express](https://expressjs.com/) - Web server for receiving search requests
+- [Nodemailer.js](https://nodemailer.com/about/) - npm library for sending emails from a Node.js server
 
 
 #### Issues in Progress
