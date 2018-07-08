@@ -1,3 +1,4 @@
+require('dotenv').config()
 const rabbitMQ = require('amqplib/callback_api')
 const craigslist = require('../craigslistHandler')
 const mailHandler = require('../mailHandler')
