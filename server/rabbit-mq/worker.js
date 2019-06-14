@@ -19,27 +19,32 @@ rabbitMQ.connect('amqp://localhost', function(error, connection) {
   })
 })
 
-function processEmailRequest (message, response) {
-    scrapeCraigslist(message)
-        .then(results => sendEmail(results, message))
-        .then(results => saveToDatabase(results, message))
+// You are calling this with 'await' but function is not 'asnyc'
+// as long as your using await/async in this project, it is better to continue doing so.
+// also need to handle error
+// response shouldn't be a variable if not being used.
+const processEmailRequest = async (message) => {
+  try {
+    const results = await scrapeCraigslist(message);
+    await sendEmail(results, message);
+    await saveToDatabase(emailResults, message);
+  } catch (err) {
+    // TODO handle err
+  }
 }
 
-function scrapeCraigslist (message) {
+const scrapeCraigslist = async (message) => {
     const url = craigslist.getSearchParameters(message)
-    return fetch(url)
-        .then(response => response.text())
-        .then(body => {
-            return craigslist.getResults(body)})
+    const response = await fetch(url);
+    const body = await response.text();
+    return craigslist.getResults(body)
 }
 
-function sendEmail (results, searchObject) {
-    mailHandler.sendEmail(craigslist.formatResultsToHTML(results), searchObject.email)
-    return results
+const sendEmail = async (results, searchObject) => {
+    await mailHandler.sendEmail(craigslist.formatResultsToHTML(results), searchObject.email)
 }
 
-function saveToDatabase (results, searchObject) {
-    db.storeSearch(searchObject.location, searchObject.searchTerm, craigslist.setSearchDate(), searchObject.email, false)
-    return results
+const saveToDatabase = async (searchObject) => {
+    await db.storeSearch(searchObject.location, searchObject.searchTerm, craigslist.setSearchDate(), searchObject.email, false)
 }
 

@@ -10,52 +10,48 @@ function getSearchParameters (message) {
 function getResults (body) {
     const $ = cheerio.load(body)
     const rows = $('li.result-row')
-    const results = []
-    formatResultsRows(results, $, rows)
-    return results
+    // why all these extra functions? just map the array
+    return (rows || []).map(element => {
+      const result = $(element)
+      const imageData = result.find('a.result-image').attr('data-ids')
+      
+      return {
+        link: result.find('.result-title').attr('href'),
+        title: result.find('.result-title').text(),
+        price: $(result.find('.result-price').get(0)).text(),
+        timePosted: result.find('.result-date').text(),
+        images: getImagesIfTheyExist(imageData)
+      }
+    });
 }
 
-function formatResultsRows (results, $, rows) {
-    rows.each((index, element) => {
-        const result = $(element)
-        const link = result.find('.result-title').attr('href')
-        const title = result.find('.result-title').text()
-        const price = $(result.find('.result-price').get(0)).text()
-        const imageData = result.find('a.result-image').attr('data-ids')
-        const timePosted = result.find('.result-date').text()
-        const images = getImagesIfTheyExist(imageData)
-        pushResultsAsList(results, title, link, price, images, timePosted)
-    })
-}
 
-function pushResultsAsList (results, title, link, price, images, timePosted) {
-    results.push({ title, link, price, images, timePosted })
-}
-
+// you don't need if/else in these next 2 functions. Just return the value
 function checkResponseForListings (results) {
-    if (results.length === 0) {
-        return false
-    } else return true
+    return results.length > 0
 }
 
 function checkRequestForErrors (request) {
     if (request.params.location && request.params.searchTerm) {
         return request
     }
-    else {
-        return 'Error, request parameters not formatted correctly, please adjust and resubmit.'
-    }
+    /*
+      would be better to throw error and handle elsewhere, ie:
+      throw new Error('request parameters not formatted correctly, please adjust and resubmit.')
+    */
+    return 'Error, request parameters not formatted correctly, please adjust and resubmit.'
 } 
 
 function formatResultsToHTML (results) {
-    let bodyOfHTML = '<h1>Listings</h1><br>'
-    results.forEach(listing => {
-        bodyOfHTML += `<h3>${listing.title}</h3>`
-        bodyOfHTML += `<img src="${listing.images[0]}"></img>`
-        bodyOfHTML += `<h3>${listing.price}</h3>`
-        bodyOfHTML += `<a href>${listing.link}</a>`
-    })
-    return bodyOfHTML
+  // clearer way to generate html
+  return (results || [])
+    .reduce((prev, next) => `
+      ${prev}
+      <h3>${listing.title}</h3>
+      <img src="${listing.images[0]}"></img>
+      <h3>${listing.price}</h3>
+      <a href>${listing.link}</a>
+    `, '<h1>Listings</h1><br>');
 }
 
 
@@ -66,6 +62,8 @@ function getImagesIfTheyExist (imageData) {
             return `https://images.craigslist.org/${id.split(':')[1]}_300x300.jpg`
         })
     } return images
+
+    // have a default return value
 }
 
 function setSearchDate () {
@@ -75,8 +73,6 @@ function setSearchDate () {
 module.exports = {
     getResults,
     formatResultsToHTML,
-    formatResultsRows,
-    pushResultsAsList,
     checkResponseForListings,
     checkRequestForErrors,
     getImagesIfTheyExist,
